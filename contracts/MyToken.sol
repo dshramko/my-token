@@ -3,10 +3,11 @@ pragma solidity ^0.4.24;
 contract MyToken {
   uint public totalSupply;
 
+  mapping(address => uint) public balanceOf;
+
   //Constructor
-  constructor() public {
-    totalSupply = 1000000;
+  constructor(uint _initialSupply) public {
+    balanceOf[msg.sender] = _initialSupply;
+    totalSupply = _initialSupply;
   }
-  // Set the total number of tokens
-  // Read the total number of tokens
 }
