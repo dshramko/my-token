@@ -23,7 +23,7 @@ contract('MyToken', (accounts) => {
     try {
       await instance.transfer.call(accounts[1], 99999999999999999999);
     } catch(err) {
-      assert.include(err.message, 'revert');
+      assert.include(err.message, 'Not enough balance');
     }
   })
 
@@ -55,5 +55,61 @@ contract('MyToken', (accounts) => {
     assert.equal(receipt.logs[0].args._from, accounts[0]);
     assert.equal(receipt.logs[0].args._to, accounts[1]);
     assert.equal(receipt.logs[0].args._value.toNumber(), 200000);
+  })
+
+  it('approve tokens for delegated transfer', async () => {
+    const instance = await MyToken.deployed();
+    const success = await instance.approve.call(accounts[1], 100);
+    assert.equal(success, true);
+
+    const receipt = await instance.approve(accounts[1], 100, { from: accounts[0] });
+    assert.equal(receipt.logs.length, 1);
+    assert.equal(receipt.logs[0].event, 'Approval');
+    assert.equal(receipt.logs[0].args._owner, accounts[0]);
+    assert.equal(receipt.logs[0].args._spender, accounts[1]);
+    assert.equal(receipt.logs[0].args._value.toNumber(), 100);
+
+    const allowance = await instance.allowance(accounts[0], accounts[1]);
+    assert.equal(allowance.toNumber(), 100);
+  })
+
+  it('handle delegate token transfer', async () => {
+    const fromAccount = accounts[2];
+    const toAccount = accounts[3];
+    const spenderAccount = accounts[4];
+    const instance = await MyToken.deployed();
+
+    await instance.transfer(fromAccount, 100, { from: accounts[0] });
+    await instance.approve(spenderAccount, 10, { from: fromAccount });
+
+    try {
+      await instance.transferFrom(fromAccount, toAccount, 9999, { from: spenderAccount });
+    } catch(err) {
+      assert.include(err.message, 'Value should be less then balance');
+    }
+
+    try {
+      await instance.transferFrom(fromAccount, toAccount, 20, { from: spenderAccount });
+    } catch(err) {
+      assert.include(err.message, 'Value should be less then approved amount');
+    }
+
+    const success = await instance.transferFrom.call(fromAccount, toAccount, 10, { from: spenderAccount });
+    assert.equal(success, true);
+
+    const receipt = await instance.transferFrom(fromAccount, toAccount, 10, { from: spenderAccount });
+    assert.equal(receipt.logs.length, 1);
+    assert.equal(receipt.logs[0].event, 'Transfer');
+    assert.equal(receipt.logs[0].args._from, fromAccount);
+    assert.equal(receipt.logs[0].args._to, toAccount);
+    assert.equal(receipt.logs[0].args._value, 10);
+
+    const balanceFromAccount = await instance.balanceOf(fromAccount);
+    const balanceToAccount = await instance.balanceOf(toAccount);
+    assert.equal(balanceFromAccount.toNumber(), 90);
+    assert.equal(balanceToAccount.toNumber(), 10);
+
+    const allowance = await instance.allowance(fromAccount, spenderAccount);
+    assert.equal(allowance.toNumber(), 0);
   })
 })

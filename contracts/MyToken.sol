@@ -12,7 +12,14 @@ contract MyToken {
     uint _value
   );
 
+  event Approval(
+    address indexed _owner,
+    address indexed _spender,
+    uint _value
+  );
+
   mapping(address => uint) public balanceOf;
+  mapping(address => mapping(address => uint)) public allowance;
 
   //Constructor
   constructor(uint _initialSupply) public {
@@ -26,13 +33,39 @@ contract MyToken {
   * @param _value The amount to be transferred.
   */
   function transfer(address _to,  uint _value) public returns(bool success) {
-    require(balanceOf[msg.sender] >= _value);
+    require(balanceOf[msg.sender] >= _value, "Not enough balance");
 
     balanceOf[msg.sender] -= _value;
     balanceOf[_to] += _value;
 
     emit Transfer(msg.sender, _to, _value);
 
+    return true;
+  }
+
+  /**
+   * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
+   * @param _spender The address which will spend the funds.
+   * @param _value The amount of tokens to be spent.
+   */
+  function approve(address _spender, uint _value) public returns (bool success) {
+    allowance[msg.sender][_spender] = _value;
+
+    emit Approval(msg.sender, _spender, _value);
+
+    return true;
+  }
+
+  function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
+    require(_value <= balanceOf[_from], "Value should be less then balance");
+    require(_value <= allowance[_from][msg.sender], "Value should be less then approved amount");
+
+    balanceOf[_from] -= _value;
+    balanceOf[_to] += _value;
+
+    allowance[_from][msg.sender] -= _value;
+
+    emit Transfer(_from, _to, _value);
     return true;
   }
 }
