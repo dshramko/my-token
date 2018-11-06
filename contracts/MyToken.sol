@@ -44,10 +44,10 @@ contract MyToken {
   }
 
   /**
-   * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
-   * @param _spender The address which will spend the funds.
-   * @param _value The amount of tokens to be spent.
-   */
+  * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
+  * @param _spender The address which will spend the funds.
+  * @param _value The amount of tokens to be spent.
+  */
   function approve(address _spender, uint _value) public returns (bool success) {
     allowance[msg.sender][_spender] = _value;
 
@@ -56,6 +56,12 @@ contract MyToken {
     return true;
   }
 
+  /**
+  * @dev Transfer tokens from one address to another
+  * @param _from address The address which you want to send tokens from
+  * @param _to address The address which you want to transfer to
+  * @param _value uint256 the amount of tokens to be transferred
+  */
   function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
     require(_value <= balanceOf[_from], "Value should be less then balance");
     require(_value <= allowance[_from][msg.sender], "Value should be less then approved amount");

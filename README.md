@@ -5,6 +5,8 @@
 
 [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-solidity) - library for secure smart contract development
 
+[token sale steps](ico.md)
+
 #### Install
 
 * Install [truffle](https://truffleframework.com/) package and ganache-cli as development blockchain for Ethereum.
