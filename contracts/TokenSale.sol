@@ -46,4 +46,15 @@ contract TokenSale {
 
     emit Sell(msg.sender, _numberOfTokens);
   }
+
+  /**
+  * @dev Ending token sale
+  */
+  function endSale() public {
+    require(msg.sender == admin, "Must be admin to end sale");
+    require(tokenContract.transfer(admin, tokenContract.balanceOf(this)));
+
+    selfdestruct(admin);
+
+  }
 }

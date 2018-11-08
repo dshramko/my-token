@@ -59,4 +59,31 @@ contract('TokenSale', (accounts) => {
       assert.include(err.message, 'Value should be equal number of tokens in wei');
     }
   })
+
+  it('end token sale', async () => {
+    const tokenInstance = await MyToken.deployed();
+
+    // Try to end sale from account other than the admin
+    try {
+    await instance.endSale({ from: buyer });
+    } catch(err) {
+      assert.include(err.message, 'Must be admin to end sale');
+    }
+
+    // Transfer remaining tokens to admin account
+    const receipt = await instance.endSale({ from: admin });
+    const balance = await tokenInstance.balanceOf(admin);
+    assert.equal(balance.toNumber(), 999990);
+
+    // Test that contact self destructed
+    const contract = await web3.eth.getCode(instance.address);
+    assert.equal(contract, 0x0);
+
+    // Try to call function of destructed contract
+    try {
+      await instance.tokenPrice();
+    } catch(err) {
+      assert.include(err.message, 'is not a contract address');
+    }
+  })
 })
