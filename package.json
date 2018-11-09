@@ -1,0 +1,14 @@
+{
+  "name": "my_token",
+  "version": "1.0.0",
+  "main": "truffle.js",
+  "repository": "git@github.com:dshramko/my-token.git",
+  "scripts": {
+    "dev": "lite-server"
+  },
+  "author": "dshramko <da.shramko@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "lite-server": "^2.4.0"
+  }
+}
