@@ -1,5 +1,10 @@
 ## My token - sample cryptocurrency on Ethereum
 
+#### Branches
+
+`front-jquery` - branch with js + jquery frontend  
+`front-react` - branch with react frontend(WIP...)
+
 #### Ethereum resources
 [EIP-20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md) - A standard interface for tokens.
 
